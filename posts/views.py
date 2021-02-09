@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Post
 from .serializers import CommentSerializer, PostSerializer
 from .permissions import IsOwnerOrReadOnly
-from rest_framework.permissions import IsAuthenticated
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -21,8 +22,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs['post_id'])
-        comments = post.comments
-        return comments
+        return post.comments
 
     def perform_create(self, serializer):
+        post = get_object_or_404(Post, id=self.kwargs['post_id'])
         serializer.save(author=self.request.user)
